@@ -16,7 +16,7 @@ class Sphere {
 		void set_center(glm::vec3);
 		void set_radius(double);
 
-		bool intersect(Ray ray);
+		double intersect(Ray ray);
 	private:
 		glm::vec3 center_;
 		double radius_;
