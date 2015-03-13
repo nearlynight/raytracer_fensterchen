@@ -29,6 +29,6 @@ class Material {
 		float m_;
 };
 
-std::ostream& operator<<(std::ostream& os, const Material& m);
+std::ostream& operator<<(std::ostream& os, Material& m);
 
-#endif MATERIAL_HPP
+#endif
