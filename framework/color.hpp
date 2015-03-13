@@ -19,7 +19,7 @@ struct Color
   float g;
   float b;
 
-  // added by TILL b/c no dflt cstr which was needed for Material 
+  // added by TILL b/c no dflt cstr was implemented for struct color and it was needed for Material class
   Color() : r(0), g(0), b(0) {}
 
   friend std::ostream& operator<<(std::ostream& os, Color const& c)
