@@ -30,7 +30,7 @@ void Sphere::set_radius(double radius) {
 }
 
 double Sphere::intersect(Ray ray) {
-
+    //TODO implement intersect with sphere
 }
 
 
@@ -47,7 +47,7 @@ double Sphere::intersect(Ray ray) {
     glm::vec3 dir = ray.direction;
 
     // compute parameters for quadratic equation ax^2 + bx + c = 0
-    double a = pow(dir.x, 2) + pow(dir.x, 2) + pow(dir.x, 2);
+    double a = pow(dir.x, 2) + pow(dir.y, 2) + pow(dir.z, 2);
     double b = 2 * (dir.x * (p0.x - center_.x) + dir.y * (p0.y - center_.y) + dir.z * (p0.z - center_.z));
     double c = pow(p0.x - center_.x, 2) + pow(p0.y - center_.y, 2) + pow(p0.z - center_.z, 2) - pow(radius_, 2);
 
