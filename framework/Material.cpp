@@ -41,8 +41,12 @@ float Material::get_m() {
 
 std::ostream& operator<<(std::ostream& os, Material& m) {
 
-	return os << "name: " << m.get_name() << " ka: " << m.get_ka() << " ks: " << m.get_ks() << " kd: " << m.get_kd() << " m :" << m.get_m();
+	return os << "Material: \n" << "name: " << m.get_name() << "\n ka: " << m.get_ka() << " ks: " << m.get_ks() << " kd: " << m.get_kd() << " m: " << m.get_m() << "\n ____________" << std::endl;
 }
+
+
+
+
 
 
 

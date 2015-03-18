@@ -4,6 +4,8 @@
 #include "color.hpp"
 #include <iostream>
 #include <string>
+#include <vector>
+#include <sstream>
 
 class Material {
 	public:
