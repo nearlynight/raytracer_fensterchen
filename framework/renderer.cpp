@@ -99,16 +99,37 @@ void Renderer::write(Pixel const& p)
 Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point) {
   Color final_color = Color(0.0, 0.0, 0.0);
   for(int i = 0; i < lights_.size(); ++i) {
-    // diffuse color
-    Color Ip = lights_[i]->getLd();
-    Color Kd = hit_obj->get_material().get_kd();
-    glm::vec3 n = glm::normalize(hit_obj->getNormalAt(hit_point));
-    glm::vec3 l = glm::normalize(lights_[i]->getPos() - hit_point);
+    // create normal and direction to light source
+    glm::vec3 n = hit_obj->getNormalAt(hit_point);
+    glm::vec3 l = lights_[i]->getPos() - hit_point;
 
-    if(glm::dot(l,n) >0)
-    final_color += Ip * Kd * glm::dot(l,n);
+    // create new ray from object to light source
+    Ray sec_ray = Ray(hit_point,l);
+
+    // diffuse color
+    Color diffuse_color;
+    if(!isInShadow(sec_ray) && glm::dot(glm::normalize(l),glm::normalize(n)) > 0){
+      Color Ip = lights_[i]->getLd();
+      Color Kd = hit_obj->get_material().get_kd();
+      diffuse_color = Ip * Kd * glm::dot(glm::normalize(l),glm::normalize(n));
+    } else {
+      diffuse_color = Color(0.0, 0.0, 0.0);
+    }
+
+    final_color += diffuse_color;
+
   }
   return final_color;
+}
+
+bool Renderer::isInShadow(Ray sec_ray) {
+  for (int i = 0; i < shapes_.size(); ++i) {
+    double d = shapes_[i]->intersect(sec_ray);
+    if (d > 0 && d < 1) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void Renderer::test(){
@@ -132,3 +153,4 @@ void Renderer::test(){
       std::cout << *material[i] << std::endl;
   }
 }
+
