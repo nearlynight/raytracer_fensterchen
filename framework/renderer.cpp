@@ -26,6 +26,7 @@ void Renderer::render() {
   // test Ausgabe
   camera_ = sdfloader_.getCamera();
   shapes_ = sdfloader_.getShapes();
+  lights_ = sdfloader_.getLights();
   test();
 
   // Abstand Camera - Bildflaeche
@@ -44,30 +45,34 @@ void Renderer::render() {
     for (unsigned x = 0; x < width_; ++x) {
       Pixel p(x,y);
 
-      // parallel projection
-      // prim_ray.origin = glm::vec3(x,y,0);
-      // prim_ray.direction =  glm::vec3(0,0,-1);
-
       // perspective projection
       glm::vec3 pointOnImagePlane = glm::vec3((double)x - width_/2 ,(double)y - height_/2 ,0);
       prim_ray.origin = camera_.position;
       prim_ray.direction = pointOnImagePlane - camera_.position;
 
-      p.color = Color(0.0,0.0,0.0);
+      double delta = -1;
+      Shape *closest_obj;
+
+      // d - distance camera - object
+      // delta - distance camera - closest object
       for(int i = 0; i < shapes_.size(); ++i) {
         double d = shapes_[i]->intersect(prim_ray);
-        if(d != -1) {
-          p.color = shapes_[i]->get_material().get_ka();
-        }
-      }
+        if(d < delta || delta == -1) {
+          if(d > 1) {
+            closest_obj = shapes_[i];
+            delta = d;
+          }
+        } 
+      }  
 
-      /*
-      if ( ((x/checkersize)%2) != ((y/checkersize)%2)) {
-        p.color = Color(0.0, 1.0, float(x)/height_);
+         
+      // calculate color
+      if (delta == -1) {
+        p.color = Color(0.0,0.0,0.0); 
       } else {
-        p.color = Color(1.0, 0.0, float(y)/width_);
+        glm::vec3 hit_point = prim_ray.origin + (float)delta * prim_ray.direction;
+        p.color = calculateColor(closest_obj, hit_point);
       }
-      */
 
       write(p);
     }
@@ -91,14 +96,37 @@ void Renderer::write(Pixel const& p)
   ppm_.write(p);
 }
 
+Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point) {
+  Color final_color = Color(0.0, 0.0, 0.0);
+  for(int i = 0; i < lights_.size(); ++i) {
+    // diffuse color
+    Color Ip = lights_[i]->getLd();
+    Color Kd = hit_obj->get_material().get_kd();
+    glm::vec3 n = glm::normalize(hit_obj->getNormalAt(hit_point));
+    glm::vec3 l = glm::normalize(lights_[i]->getPos() - hit_point);
+    final_color += Ip * Kd * glm::dot(l,n);
+  }
+  return final_color;
+}
+
 void Renderer::test(){
+  
+  // shapes
   for (int i = 0; i < shapes_.size(); ++i) {
-      std::cout << shapes_[i]->get_name() << std::endl;
-    }
+      std::cout << "shape name: " << shapes_[i]->get_name() << std::endl;
+  }
+
+  // light sources
+  for (int i = 0; i < lights_.size(); ++i) {
+    std::cout << "light source: " << lights_[i]->getName() << std::endl;
+  }
+
+  // camera
   std::cout << "Camera: " << camera_.name << std::endl;
 
+  // materials
   std::vector<Material*> material = sdfloader_.getMaterials(); 
   for (int i = 0; i < material.size(); ++i) {
-      std::cout <<  *material[i] << std::endl;
-    }
+      std::cout << *material[i] << std::endl;
+  }
 }
