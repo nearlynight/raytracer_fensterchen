@@ -106,7 +106,7 @@ Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point)
     // create new ray from object to light source
     Ray sec_ray = Ray(hit_point,l);
 
-    // diffuse color
+    // diffuse light
     Color diffuse_color;
     if(!isInShadow(sec_ray) && glm::dot(glm::normalize(l),glm::normalize(n)) > 0){
       Color Ip = lights_[i]->getLd();
@@ -116,7 +116,13 @@ Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point)
       diffuse_color = Color(0.0, 0.0, 0.0);
     }
 
-    final_color += diffuse_color;
+    // ambient light
+    Color Ia = lights_[i]->getLa();
+    Color Ka = hit_obj->get_material().get_ka();
+    Color ambient_color = Ia * Ka;
+
+
+    final_color += diffuse_color + ambient_color;
 
   }
   return final_color;
