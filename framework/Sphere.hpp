@@ -12,8 +12,9 @@ class Sphere : public Shape {
 		~Sphere();
 
 		/* virtual */ std::string get_name();
-		/* virtual */ Material get_material();
+		/* virtual */ Material get_material() const;
 		/* virtual */ double intersect(Ray ray);
+		/* virtual */ glm::vec3 getNormalAt(glm::vec3 intersection_point) const;
 
 		glm::vec3 get_center();
 		double get_radius();

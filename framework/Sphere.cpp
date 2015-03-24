@@ -30,7 +30,7 @@ double Sphere::get_radius() {
 	return radius_;
 }
 
-Material Sphere::get_material() {
+Material Sphere::get_material() const {
     return material_;
 }
 
@@ -58,28 +58,23 @@ void Sphere::set_material(Material material) {
 
 double Sphere::intersect(Ray ray) {
 
-    // parameters of ray
-    glm::vec3 p0 = ray.origin;
-    glm::vec3 dir = ray.direction;
-
-    // compute parameters for quadratic equation ax^2 + bx + c = 0
-    double a = pow(dir.x, 2) + pow(dir.y, 2) + pow(dir.z, 2);
-    double b = 2 * (dir.x * (p0.x - center_.x) + dir.y * (p0.y - center_.y) + dir.z * (p0.z - center_.z));
-    double c = pow(p0.x - center_.x, 2) + pow(p0.y - center_.y, 2) + pow(p0.z - center_.z, 2) - pow(radius_, 2);
-
     // compute delta and handle cases
-    double delta = pow(b, 2) - 4 * a * c;
+    float a = glm::dot(ray.direction, ray.direction); // a = d*d
+    float b = 2.0f*glm::dot(ray.direction, ray.origin - center_); // b = 2d(o-C)
+    float c = glm::dot(ray.origin - center_, ray.origin - center_) - pow(radius_, 2); // c = (o-C)^2-R^2
+
+    //Calculate discriminant
+    float delta = (b*b) - (4.0f*a*c);
+
     if (delta < 0) {
 
         // no intersection
         return -1;
-    }
-    else if (delta == 0) {
+    } else if (delta == 0) {
 
         // one intersection
         return (-1 * b) / (2 * a);
-    }
-    else {
+    } else {
 
         // two intersections
         double d1 = (-1 * b - sqrt(delta)) / (2 * a);
@@ -89,3 +84,15 @@ double Sphere::intersect(Ray ray) {
 }
 
 // // // // // // // // // // // // // // // // // // // // // // // // // // // //
+
+
+glm::vec3 Sphere::getNormalAt(glm::vec3 intersection_point) const{
+    glm::vec3 normal;
+    normal = intersection_point - center_;
+    return normal;
+}
+
+
+
+
+
