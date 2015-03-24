@@ -2,24 +2,34 @@
 #define SPHERE_HPP
 
 #include <glm/glm.hpp>
-#include "Ray.hpp"
+//#include "Material.hpp"
+#include "Shape.hpp"
 
-class Sphere {
+class Sphere : public Shape {
 	public:
 		Sphere();
-		Sphere(glm::vec3 center, double radius);
+		Sphere(std::string name, glm::vec3 center, double radius, Material material);
 		~Sphere();
+
+		/* virtual */ std::string get_name();
+		/* virtual */ Material get_material();
+		/* virtual */ double intersect(Ray ray);
 
 		glm::vec3 get_center();
 		double get_radius();
+		
 
+		void set_name(std::string);
 		void set_center(glm::vec3);
 		void set_radius(double);
+		void set_material(Material);
 
-		double intersect(Ray ray);
+		
 	private:
+		std::string name_;
 		glm::vec3 center_;
 		double radius_;
+		Material material_;
 
 
 };

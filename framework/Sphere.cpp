@@ -2,16 +2,25 @@
 
 
 Sphere::Sphere() {
+    name_ = " ";
 	center_ = glm::vec3(10.0,10.0,10.0);
 	radius_ = 5.0;
+    material_ = Material();
 }
 
-Sphere::Sphere(glm::vec3 center, double radius) {
-	center_ = center;
+Sphere::Sphere(std::string name, glm::vec3 center, double radius, Material material) {
+	name_ = name;
+    center_ = center;
 	radius_ = radius;
+    material_ = material;
 }
 
 Sphere::~Sphere() { }
+
+
+std::string Sphere::get_name() {
+    return name_;
+}
 
 glm::vec3 Sphere::get_center() {
 	return center_;
@@ -19,6 +28,15 @@ glm::vec3 Sphere::get_center() {
 
 double Sphere::get_radius() {
 	return radius_;
+}
+
+Material Sphere::get_material() {
+    return material_;
+}
+
+
+void Sphere::set_name(std::string name) {
+    name_ = name;
 }
 
 void Sphere::set_center(glm::vec3 center) {
@@ -29,14 +47,12 @@ void Sphere::set_radius(double radius) {
 	radius_ = radius;
 }
 
-double Sphere::intersect(Ray ray) {
-    //TODO implement intersect with sphere
+void Sphere::set_material(Material material) {
+    material_ = material;
 }
 
 
-/*
-
-intersect from Sascha
+// intersect from Sascha
 
 // // // // // // // // // // // // // // // // // // // // // // // // // // // // 
 
@@ -73,4 +89,3 @@ double Sphere::intersect(Ray ray) {
 }
 
 // // // // // // // // // // // // // // // // // // // // // // // // // // // //
-*/
