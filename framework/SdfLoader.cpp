@@ -89,6 +89,30 @@ void SdfLoader::readFile(std::string filename) {
 		    			camera_.name = name;
 		    			camera_.opening_angle = opening_angle;
 		    			i = i + 4;
+
+		    		// LIGHT SOURCE
+		    		} else if (words[i+1].compare("light") == 0 ) {
+		    			std::string name = words[i+2];
+		    			glm::vec3 pos = glm::vec3(
+		    				std::stof(words[i+3]),
+		    				std::stof(words[i+4]),
+							std::stof(words[i+5])
+						);
+						Color la = Color(
+                            std::stof(words[i + 6]), 
+                            std::stof(words[i + 7]), 
+                            std::stof(words[i + 8])
+                        );
+                        Color ld = Color(
+                            std::stof(words[i + 9]), 
+                            std::stof(words[i + 10]), 
+                            std::stof(words[i + 11])
+                        );
+                        Light *light = new Light(name, pos, la, ld);
+		    			lights_.push_back(dynamic_cast<Light*>(light));
+		    			i = i + 12;
+
+		    		// DEFINE WITHOUT ADDITIONAL PARAMETERS FOUND
 		    		} else {
 		    			std::cout << "define found but no corresponding parameters" << std::endl;		    		
 		    		}
@@ -112,6 +136,10 @@ std::vector<Material*> SdfLoader::getMaterials() {
 
 std::vector<Shape*> SdfLoader::getShapes() {
 	return shapes_;
+}
+
+std::vector<Light*> SdfLoader::getLights() {
+	return lights_;
 }
 
 Camera SdfLoader::getCamera() {

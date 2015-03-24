@@ -11,6 +11,7 @@
 //#include "Shape.hpp"
 #include "Sphere.hpp"
 #include "Camera.hpp"
+#include "Light.hpp"
 
 
 class SdfLoader {
@@ -25,12 +26,14 @@ class SdfLoader {
 		void readFile(std::string filename);
 		std::vector<Material*> getMaterials();
 		std::vector<Shape*> getShapes();
+		std::vector<Light*> getLights();
 		Camera getCamera();
 		static std::vector<std::string> splitLine(std::string line);	
 
 	private:
 		std::vector<Material*> materials_;
 		std::vector<Shape*> shapes_;
+		std::vector<Light*> lights_;
 		Camera camera_;
 };
 
