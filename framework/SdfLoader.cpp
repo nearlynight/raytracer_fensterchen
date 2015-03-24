@@ -46,8 +46,8 @@ void SdfLoader::readFile(std::string filename) {
                             std::stof(words[i + 11])
                         );
                         float m = std::stof(words[i+12]);
-                        static Material my_material = Material(name,ka,kd,ks,m);
-                        materials_.push_back(dynamic_cast<Material*>(&my_material));
+                        Material *my_material = new Material(name,ka,kd,ks,m);
+                        materials_.push_back(dynamic_cast<Material*>(my_material));
                         i = i + 13;
 
                     // SPHERE
@@ -77,8 +77,8 @@ void SdfLoader::readFile(std::string filename) {
 		    					material = *materials_.at(found_at);
 		    				}
 
-		    				static Sphere sphere = Sphere(name, center, radius, material);
-		    				shapes_.push_back(dynamic_cast<Sphere*>(&sphere));
+		    				Sphere *sphere = new Sphere(name, center, radius, material);
+		    				shapes_.push_back(dynamic_cast<Sphere*>(sphere));
 		    			}
 		    			i = i + 9;
 
@@ -90,7 +90,8 @@ void SdfLoader::readFile(std::string filename) {
 		    			camera_.opening_angle = opening_angle;
 		    			i = i + 4;
 		    		} else {
-		    			std::cout << "define found but no corresponding parameters" << std::endl;		    		}
+		    			std::cout << "define found but no corresponding parameters" << std::endl;		    		
+		    		}
 		    		
 		    	} else {
 		    		++i;
