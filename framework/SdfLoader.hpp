@@ -1,12 +1,17 @@
 #ifndef SDFLOADER_HPP
 #define SDFLOADER_HPP
 
-#include <vector>
+//#include <vector>
 #include <fstream>
-#include <iostream>
-#include <string>
+//#include <iostream>
+//#include <string>
+#include <glm/glm.hpp>
 
-#include "Material.hpp"
+//#include "Material.hpp"
+//#include "Shape.hpp"
+#include "Sphere.hpp"
+#include "Camera.hpp"
+
 
 class SdfLoader {
 	public:
@@ -17,13 +22,16 @@ class SdfLoader {
 
 		// has to inread file, each vector field has one line of sdf file
 		// 
-		static std::vector<Material> readFile(std::string filename);
+		void readFile(std::string filename);
+		std::vector<Material*> getMaterials();
+		std::vector<Shape*> getShapes();
+		Camera getCamera();
 		static std::vector<std::string> splitLine(std::string line);	
-		
 
 	private:
-		//std::vector<std::string> materialVector_;
-
+		std::vector<Material*> materials_;
+		std::vector<Shape*> shapes_;
+		Camera camera_;
 };
 
 #endif

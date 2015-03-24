@@ -13,10 +13,7 @@ SdfLoader::SdfLoader(std::vector<std::string> materialVector) {
 SdfLoader::~SdfLoader() { }
 
 
-std::vector<Material> SdfLoader::readFile(std::string filename) {
-	//std::vector<std::string> materialVectorString;
-	std::vector<Material> materialVector;
-
+void SdfLoader::readFile(std::string filename) {
 	std::ifstream ifs (filename);
 	char line[256];
 	if (ifs.is_open()) {
@@ -28,6 +25,8 @@ std::vector<Material> SdfLoader::readFile(std::string filename) {
 		    while(i < words.size()) {
 		    	if(words[i].compare("define") == 0) {
 		    		//std::cout << "define gefunden" << std::endl;
+
+		    		// MATERIAL
 		    		if(words[i+1].compare("material") == 0) {
 		    			//std::cout << "material gefunden" << std::endl;
 		    			std::string name = words[i+2];
@@ -47,16 +46,55 @@ std::vector<Material> SdfLoader::readFile(std::string filename) {
                             std::stof(words[i + 11])
                         );
                         float m = std::stof(words[i+12]);
-                        materialVector.push_back(Material(name,ka,kd,ks,m));
+                        static Material my_material = Material(name,ka,kd,ks,m);
+                        materials_.push_back(dynamic_cast<Material*>(&my_material));
                         i = i + 13;
 
+                    // SPHERE
+		    		} else if(words[i+1].compare("shape") == 0) {
+		    			if(words[i+2].compare("sphere") == 0) {
+		    				std::string name = words[i+3];
+		    				glm::vec3 center = glm::vec3(
+		    					std::stof(words[i+4]),
+		    					std::stof(words[i+5]),
+		    					std::stof(words[i+6])
+		    					);
+		    				double radius = std::stod(words[i+7]);
+		    				std::string mat_name = words[i+8];
+
+		    				int found_at = -1;
+		    				for (int j = 0; j < materials_.size() && found_at == -1; ++j) {
+		    					if(materials_.at(j)->get_name().compare(mat_name) == 0) {
+		    						found_at = j;
+		    					}
+		    				}
+
+		    				Material material;
+		    				if(found_at == -1) {
+		    					std::cout << "corresponding material not found: " << mat_name << std::endl;
+		    					material = Material();
+		    				} else {
+		    					material = *materials_.at(found_at);
+		    				}
+
+		    				static Sphere sphere = Sphere(name, center, radius, material);
+		    				shapes_.push_back(dynamic_cast<Sphere*>(&sphere));
+		    			}
+		    			i = i + 9;
+
+		    		// CAMERA
+		    		} else if(words[i+1].compare("camera") == 0) {
+		    			std::string name = words[i+2];
+		    			double opening_angle = std::stod(words[i+3]);
+		    			camera_.name = name;
+		    			camera_.opening_angle = opening_angle;
+		    			i = i + 4;
 		    		} else {
-		    			// add here for light, shape
-		    			std::cout << " schade eigentlich" << std::endl;
-		    		}
+		    			std::cout << "define found but no corresponding parameters" << std::endl;		    		}
+		    		
 		    	} else {
 		    		++i;
-		    		std::cout << "schade eigentlich" << std::endl;
+		    		std::cout << "Error parsing file" << std::endl;
 		    	}
 		    }
 		}
@@ -65,11 +103,19 @@ std::vector<Material> SdfLoader::readFile(std::string filename) {
 	    // show message:
 	    std::cout << "Error opening file :( " << std::endl;
 	}
-
-	
-	return materialVector;
 }
 
+std::vector<Material*> SdfLoader::getMaterials() {
+	return materials_;
+}
+
+std::vector<Shape*> SdfLoader::getShapes() {
+	return shapes_;
+}
+
+Camera SdfLoader::getCamera() {
+	return camera_;
+}
 
 std::vector<std::string> SdfLoader::splitLine(std::string line) {
 	std::vector<std::string> words;
@@ -79,8 +125,7 @@ std::vector<std::string> SdfLoader::splitLine(std::string line) {
         ssin >> word;
         words.push_back(word);
     }
-    
-	
 	return words;
 
 }
+
