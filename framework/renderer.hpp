@@ -13,13 +13,17 @@
 #include "color.hpp"
 #include "pixel.hpp"
 #include "ppmwriter.hpp"
+#include "SdfLoader.hpp"
+
+
 #include <string>
 #include <glm/glm.hpp>
+
 
 class Renderer
 {
 public:
-  Renderer(unsigned w, unsigned h, std::string const& file);
+  Renderer(unsigned w, unsigned h, std::string const& file, SdfLoader const& sdfloader);
 
   void render();
   void write(Pixel const& p);
@@ -35,6 +39,10 @@ private:
   std::vector<Color> colorbuffer_;
   std::string filename_;
   PpmWriter ppm_;
+  SdfLoader sdfloader_;
+
+  Camera camera_;
+  std::vector<Shape*> shapes_;
 };
 
 #endif // #ifndef BUW_RENDERER_HPP
