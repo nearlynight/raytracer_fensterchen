@@ -104,6 +104,8 @@ Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point)
     Color Kd = hit_obj->get_material().get_kd();
     glm::vec3 n = glm::normalize(hit_obj->getNormalAt(hit_point));
     glm::vec3 l = glm::normalize(lights_[i]->getPos() - hit_point);
+
+    if(glm::dot(l,n) >0)
     final_color += Ip * Kd * glm::dot(l,n);
   }
   return final_color;
