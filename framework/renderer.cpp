@@ -22,15 +22,11 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, SdfLoader co
 {}
 
 void Renderer::render() {
-  
+
   // test Ausgabe
   camera_ = sdfloader_.getCamera();
   shapes_ = sdfloader_.getShapes();
-  for (int i = 0; i < shapes_.size(); ++i) {
-    std::cout << shapes_[i]->get_name() << std::endl;
-  }
-
-  std::cout << "Camera: " << camera_.name << std::endl;
+  test();
 
   // Abstand Camera - Bildflaeche
   double cam_z = tan((90 - camera_.opening_angle / 2) * M_PI / 180) * (width_/2);
@@ -53,7 +49,7 @@ void Renderer::render() {
       // prim_ray.direction =  glm::vec3(0,0,-1);
 
       // perspective projection
-      glm::vec3 pointOnImagePlane = glm::vec3(x - (width_/2) ,y - (height_/2) ,0);
+      glm::vec3 pointOnImagePlane = glm::vec3((double)x - width_/2 ,(double)y - height_/2 ,0);
       prim_ray.origin = camera_.position;
       prim_ray.direction = pointOnImagePlane - camera_.position;
 
@@ -61,9 +57,7 @@ void Renderer::render() {
       for(int i = 0; i < shapes_.size(); ++i) {
         double d = shapes_[i]->intersect(prim_ray);
         if(d != -1) {
-          p.color = Color(0.2,0.5,0.8);
-        } else {
-          p.color = Color(1,1,1);
+          p.color = shapes_[i]->get_material().get_ka();
         }
       }
 
@@ -95,4 +89,16 @@ void Renderer::write(Pixel const& p)
   }
 
   ppm_.write(p);
+}
+
+void Renderer::test(){
+  for (int i = 0; i < shapes_.size(); ++i) {
+      std::cout << shapes_[i]->get_name() << std::endl;
+    }
+  std::cout << "Camera: " << camera_.name << std::endl;
+
+  std::vector<Material*> material = sdfloader_.getMaterials(); 
+  for (int i = 0; i < material.size(); ++i) {
+      std::cout <<  *material[i] << std::endl;
+    }
 }

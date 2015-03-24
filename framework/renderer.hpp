@@ -15,7 +15,6 @@
 #include "ppmwriter.hpp"
 #include "SdfLoader.hpp"
 
-
 #include <string>
 #include <glm/glm.hpp>
 
@@ -27,6 +26,7 @@ public:
 
   void render();
   void write(Pixel const& p);
+  void test();
 
   inline std::vector<Color> const& colorbuffer() const
   {
