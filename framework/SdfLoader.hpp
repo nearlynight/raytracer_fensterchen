@@ -12,6 +12,7 @@
 #include "Sphere.hpp"
 #include "Camera.hpp"
 #include "Light.hpp"
+#include "Plane.hpp"
 
 
 class SdfLoader {

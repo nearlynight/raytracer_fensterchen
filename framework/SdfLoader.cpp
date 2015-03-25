@@ -79,8 +79,39 @@ void SdfLoader::readFile(std::string filename) {
 
 		    				Sphere *sphere = new Sphere(name, center, radius, material);
 		    				shapes_.push_back(dynamic_cast<Sphere*>(sphere));
+		    				i = i + 9;
+
+		    			// PLANE
+		    			} else if (words[i+2].compare("plane") == 0) {
+		    				std::string name = words[i+3];
+		    				glm::vec3 normal = glm::vec3(
+		    					std::stof(words[i+4]),
+		    					std::stof(words[i+5]),
+		    					std::stof(words[i+6])
+		    					);
+		    				double d = std::stod(words[i+7]);
+		    				std::string mat_name = words[i+8];
+		    			
+		    				int found_at = -1;
+		    				for (int j = 0; j < materials_.size() && found_at == -1; ++j) {
+		    					if(materials_.at(j)->get_name().compare(mat_name) == 0) {
+		    						found_at = j;
+		    					}
+		    				}
+			    			Material material;
+			    			if(found_at == -1) {
+			    				std::cout << "corresponding material not found: " << mat_name << std::endl;
+			    				material = Material();
+			    			} else {
+			    				material = *materials_.at(found_at);
+			    			}
+
+			    			Plane *plane = new Plane(name, normal, d, material);
+			    			shapes_.push_back(dynamic_cast<Plane*>(plane));
+			    			i = i + 9;
+		    			} else {
+		    				std::cout << "no shape(s) found" << std::endl;
 		    			}
-		    			i = i + 9;
 
 		    		// CAMERA
 		    		} else if(words[i+1].compare("camera") == 0) {
@@ -119,14 +150,13 @@ void SdfLoader::readFile(std::string filename) {
 		    		
 		    	} else {
 		    		++i;
-		    		std::cout << "Error parsing file" << std::endl;
+		    		// std::cout << "Error parsing file " << words[i] << std::endl;
 		    	}
 		    }
-		}
-	    
+		}	    
 	} else {
 	    // show message:
-	    std::cout << "Error opening file :( " << std::endl;
+	    std::cout << "Error opening file" << std::endl;
 	}
 }
 
