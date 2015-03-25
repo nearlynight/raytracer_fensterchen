@@ -64,8 +64,7 @@ void Renderer::render() {
           }
         } 
       }  
-
-         
+ 
       // calculate color
       if (delta == -1) {
         p.color = Color(0.0,0.0,0.0); 
@@ -131,7 +130,8 @@ Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point)
 bool Renderer::isInShadow(Ray sec_ray) {
   for (int i = 0; i < shapes_.size(); ++i) {
     double d = shapes_[i]->intersect(sec_ray);
-    if (d > 0 && d < 1) {
+    // accuracy!
+    if (d > 0.0001 && d < 1) {
       return true;
     }
   }
