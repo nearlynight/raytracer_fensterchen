@@ -131,7 +131,7 @@ bool Renderer::isInShadow(Ray sec_ray) {
   for (int i = 0; i < shapes_.size(); ++i) {
     double d = shapes_[i]->intersect(sec_ray);
     // accuracy!
-    if (d > 0.0001 && d < 1) {
+    if (d > 0 && d < 1) {
       return true;
     }
   }
