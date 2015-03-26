@@ -62,20 +62,7 @@ void SdfLoader::readFile(std::string filename) {
 		    				double radius = std::stod(words[i+7]);
 		    				std::string mat_name = words[i+8];
 
-		    				int found_at = -1;
-		    				for (int j = 0; j < materials_.size() && found_at == -1; ++j) {
-		    					if(materials_.at(j)->get_name().compare(mat_name) == 0) {
-		    						found_at = j;
-		    					}
-		    				}
-
-		    				Material material;
-		    				if(found_at == -1) {
-		    					std::cout << "corresponding material not found: " << mat_name << std::endl;
-		    					material = Material();
-		    				} else {
-		    					material = *materials_.at(found_at);
-		    				}
+		    				Material material = getMaterialByName(mat_name);
 
 		    				Sphere *sphere = new Sphere(name, center, radius, material);
 		    				shapes_.push_back(dynamic_cast<Sphere*>(sphere));
@@ -92,23 +79,32 @@ void SdfLoader::readFile(std::string filename) {
 		    				double d = std::stod(words[i+7]);
 		    				std::string mat_name = words[i+8];
 		    			
-		    				int found_at = -1;
-		    				for (int j = 0; j < materials_.size() && found_at == -1; ++j) {
-		    					if(materials_.at(j)->get_name().compare(mat_name) == 0) {
-		    						found_at = j;
-		    					}
-		    				}
-			    			Material material;
-			    			if(found_at == -1) {
-			    				std::cout << "corresponding material not found: " << mat_name << std::endl;
-			    				material = Material();
-			    			} else {
-			    				material = *materials_.at(found_at);
-			    			}
+		    				Material material = getMaterialByName(mat_name);
 
 			    			Plane *plane = new Plane(name, normal, d, material);
 			    			shapes_.push_back(dynamic_cast<Plane*>(plane));
 			    			i = i + 9;
+
+			    		// BOX
+			    		} else if (words[i+2].compare("box") == 0) {
+		    				std::string name = words[i+3];
+		    				glm::vec3 p1 = glm::vec3(
+		    					std::stof(words[i+4]),
+		    					std::stof(words[i+5]),
+		    					std::stof(words[i+6])
+		    				);
+		    				glm::vec3 p2 = glm::vec3(
+		    					std::stof(words[i+7]),
+		    					std::stof(words[i+8]),
+		    					std::stof(words[i+9])
+		    				);
+
+		    				std::string mat_name = words[i+10];
+		    				Material material = getMaterialByName(mat_name);
+		    				Box *box = new Box(name, p1, p2, material);
+		    				shapes_.push_back(dynamic_cast<Box*>(box));
+		    				i = i + 11;
+
 		    			} else {
 		    				std::cout << "no shape(s) found" << std::endl;
 		    			}
@@ -185,6 +181,21 @@ std::vector<std::string> SdfLoader::splitLine(std::string line) {
         words.push_back(word);
     }
 	return words;
-
 }
 
+Material SdfLoader::getMaterialByName(std::string name) {
+	int found_at = -1;
+	for (int j = 0; j < materials_.size() && found_at == -1; ++j) {
+		if(materials_.at(j)->get_name().compare(name) == 0) {
+			found_at = j;
+		}
+	}
+	Material material;
+	if(found_at == -1) {
+		std::cout << "corresponding material not found: " << name << std::endl;
+		material = Material();
+	} else {
+		material = *materials_.at(found_at);
+	}
+	return material;
+}

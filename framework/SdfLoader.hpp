@@ -13,6 +13,7 @@
 #include "Camera.hpp"
 #include "Light.hpp"
 #include "Plane.hpp"
+#include "Box.hpp"
 
 
 class SdfLoader {
@@ -30,6 +31,7 @@ class SdfLoader {
 		std::vector<Light*> getLights();
 		Camera getCamera();
 		static std::vector<std::string> splitLine(std::string line);	
+		Material getMaterialByName(std::string name);
 
 	private:
 		std::vector<Material*> materials_;
