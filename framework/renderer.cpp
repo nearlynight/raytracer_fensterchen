@@ -70,7 +70,7 @@ void Renderer::render() {
         p.color = Color(0.0,0.0,0.0); 
       } else {
         glm::vec3 hit_point = prim_ray.origin + (float)delta * prim_ray.direction;
-        p.color = calculateColor(closest_obj, hit_point);
+        p.color = calculateColor(closest_obj, hit_point, prim_ray);
       }
 
       write(p);
@@ -95,7 +95,7 @@ void Renderer::write(Pixel const& p)
   ppm_.write(p);
 }
 
-Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point) {
+Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point, Ray const& prim_ray) {
   Color final_color = Color(0.0, 0.0, 0.0);
   for(int i = 0; i < lights_.size(); ++i) {
     // create normal and direction to light source
@@ -105,14 +105,30 @@ Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point)
     // create new ray from object to light source
     Ray sec_ray = Ray(hit_point,l);
 
-    // diffuse light
+    // diffuse and specular light
     Color diffuse_color;
+    Color specular_color;
     if(!isInShadow(sec_ray) && glm::dot(glm::normalize(l),glm::normalize(n)) > 0){
+
+      // diffuse light
       Color Ip = lights_[i]->getLd();
       Color Kd = hit_obj->get_material().get_kd();
       diffuse_color = Ip * Kd * glm::dot(glm::normalize(l),glm::normalize(n));
+
+      // specular light
+      glm::vec3 r = 2 * glm::dot(glm::normalize(l),glm::normalize(n)) * glm::normalize(n); // Reflektionswinkel Lichtquelle
+      glm::vec3 v = glm::normalize(prim_ray.direction); // Ausfallswinkel
+      v *= -1;
+      if (glm::dot(v,r) > 0) {
+        float m = hit_obj->get_material().get_m();
+        Color Ks = hit_obj->get_material().get_ks();
+        specular_color = Ks * pow(glm::dot(r,v),m);
+      } else {
+        specular_color = Color(0.0, 0.0, 0.0);
+      }
     } else {
       diffuse_color = Color(0.0, 0.0, 0.0);
+      specular_color = Color(0.0, 0.0, 0.0);
     }
 
     // ambient light
@@ -121,7 +137,8 @@ Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point)
     Color ambient_color = Ia * Ka;
 
 
-    final_color += diffuse_color + ambient_color;
+
+    final_color += diffuse_color + ambient_color + specular_color;
 
   }
   return final_color;
@@ -130,7 +147,7 @@ Color Renderer::calculateColor(const Shape* hit_obj, glm::vec3 const& hit_point)
 bool Renderer::isInShadow(Ray sec_ray) {
   for (int i = 0; i < shapes_.size(); ++i) {
     double d = shapes_[i]->intersect(sec_ray);
-    // accuracy!
+    // accuracy?
     if (d > 0 && d < 1) {
       return true;
     }
